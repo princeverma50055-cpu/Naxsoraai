@@ -5,7 +5,7 @@
 
 import { sendChatMessage, sendMessageWithFile, generateImage } from "./api.js";
 import NAXSORA_CONFIG from "./config.js";
-import { requireAuth, signOut, supabase } from "./auth.js";
+
 
 // ── State ────────────────────────────────────────────────────
 const state = {
@@ -51,14 +51,7 @@ const dom = {
 };
 
 // ── Init ─────────────────────────────────────────────────────
-async function init() {
-  // Auth guard — redirect to login if not signed in
-  const user = await requireAuth();
-  if (!user) return;
-
-  // Show user info in sidebar
-  renderUserProfile(user);
-
+function init() {
   applyTheme(state.settings.theme);
   renderSidebar();
   loadSettingsUI();
@@ -70,26 +63,6 @@ async function init() {
   }
 
   bindEvents();
-}
-
-// ── Render user profile in sidebar footer ────────────────────
-function renderUserProfile(user) {
-  const el = document.getElementById("user-profile");
-  if (!el) return;
-  const name = user.user_metadata?.full_name || user.email?.split("@")[0] || "User";
-  const avatar = user.user_metadata?.avatar_url;
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--bg-tertiary);border:1px solid var(--border)">
-      ${avatar
-        ? `<img src="${avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover" />`
-        : `<div style="width:30px;height:30px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>`
-      }
-      <div style="flex:1;min-width:0">
-        <div style="font-size:0.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</div>
-        <div style="font-size:0.7rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${user.email}</div>
-      </div>
-      <button onclick="window.naxsora.logout()" title="Sign out" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:15px;padding:2px;transition:color 0.2s" onmouseover="this.style.color='var(--error)'" onmouseout="this.style.color='var(--text-muted)'">⏻</button>
-    </div>`;
 }
 
 // ── Theme ────────────────────────────────────────────────────
@@ -615,9 +588,6 @@ window.naxsora = {
     a.click();
   },
   clearAttachment,
-  logout: async () => {
-    if (confirm("Sign out of Naxsora AI?")) await signOut();
-  },
   useSuggestion: (text) => {
     dom.userInput.value = text;
     dom.userInput.focus();
