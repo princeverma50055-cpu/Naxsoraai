@@ -9,6 +9,9 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL = "https://yciefqskumwsnbzhlzqt.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljaWVmcXNrdW13c25iemhsenF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NzMxODcsImV4cCI6MjA5NjE0OTE4N30.4HQQ12eIgzfT3ozWOoHygVZyZPlGbVEaXpOKCPAwqhw";
 
+// ── Hardcoded GitHub Pages URL ────────────────────────────────
+const APP_BASE_URL = "https://princeverma50055-cpu.github.io/Naxsoraai";
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ── Get current session ──────────────────────────────────────
@@ -28,7 +31,7 @@ export async function loginWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: window.location.origin + "/index.html",
+      redirectTo: APP_BASE_URL + "/index.html",
     },
   });
   if (error) throw error;
@@ -41,6 +44,7 @@ export async function signUp(email, password, fullName) {
     password,
     options: {
       data: { full_name: fullName, avatar_url: "" },
+      emailRedirectTo: APP_BASE_URL + "/index.html",
     },
   });
   if (error) throw error;
@@ -58,13 +62,13 @@ export async function signIn(email, password) {
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
-  window.location.href = "login.html";
+  window.location.href = APP_BASE_URL + "/login.html";
 }
 
 // ── Password Reset ────────────────────────────────────────────
 export async function resetPassword(email) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/reset-password.html",
+    redirectTo: APP_BASE_URL + "/login.html",
   });
   if (error) throw error;
 }
@@ -80,7 +84,7 @@ export function onAuthChange(callback) {
 export async function requireAuth() {
   const session = await getSession();
   if (!session) {
-    window.location.href = "login.html";
+    window.location.href = APP_BASE_URL + "/login.html";
     return null;
   }
   return session.user;
@@ -90,6 +94,6 @@ export async function requireAuth() {
 export async function redirectIfAuth() {
   const session = await getSession();
   if (session) {
-    window.location.href = "index.html";
+    window.location.href = APP_BASE_URL + "/index.html";
   }
 }
