@@ -21,8 +21,8 @@ const defaultSettings = {
   theme: NAXSORA_CONFIG.DEFAULT_THEME,
   streaming: true,
   soundEnabled: false,
-  model: NAXSORA_CONFIG.ANTHROPIC_MODEL,
-  apiKey: NAXSORA_CONFIG.ANTHROPIC_API_KEY,
+  model: 'gemini-1.5-flash',
+  apiKey: localStorage.getItem('naxsora_gemini_key') || '',
 };
 
 Object.keys(defaultSettings).forEach((k) => {
@@ -507,12 +507,12 @@ function loadSettingsUI() {
   const streamToggle = $("toggle-streaming");
   const themeToggle = $("toggle-theme-setting");
 
-  if (apiInput) apiInput.value = state.settings.apiKey !== "YOUR_ANTHROPIC_API_KEY_HERE" ? state.settings.apiKey : "";
+  if (apiInput) apiInput.value = localStorage.getItem('naxsora_gemini_key') || '';
   if (modelSelect) modelSelect.value = state.settings.model;
   if (streamToggle) streamToggle.classList.toggle("on", state.settings.streaming);
   if (themeToggle) themeToggle.classList.toggle("on", state.settings.theme === "dark");
 
-  if (dom.modelBadge) dom.modelBadge.textContent = state.settings.model.includes("opus") ? "Claude Opus 4" : "Claude Sonnet 4";
+  if (dom.modelBadge) dom.modelBadge.textContent = "Gemini 1.5 Flash";
 }
 
 function saveSettingsFromUI() {
@@ -521,11 +521,12 @@ function saveSettingsFromUI() {
 
   if (apiInput && apiInput.value.trim()) {
     state.settings.apiKey = apiInput.value.trim();
-    NAXSORA_CONFIG.ANTHROPIC_API_KEY = state.settings.apiKey;
+    window._naxsoraApiKey = state.settings.apiKey;
+    localStorage.setItem('naxsora_gemini_key', state.settings.apiKey);
   }
   if (modelSelect) {
     state.settings.model = modelSelect.value;
-    NAXSORA_CONFIG.ANTHROPIC_MODEL = state.settings.model;
+    
   }
   saveSettings();
   loadSettingsUI();
